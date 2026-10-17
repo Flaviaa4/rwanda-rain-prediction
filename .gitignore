@@ -1,0 +1,19 @@
+# Data, trained models and results live on Google Drive, never in Git.
+project_data/
+raw/
+*.csv
+*.zip
+*.joblib
+*.h5
+*.keras
+results/
+models/
+
+# Python and Jupyter clutter
+__pycache__/
+*.py[cod]
+.ipynb_checkpoints/
+.venv/
+venv/
+.env
+.DS_Store

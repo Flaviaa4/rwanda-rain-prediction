@@ -1,0 +1,90 @@
+# Every experiment in the order it was performed.
+# feature_set is "base" (37 numeric features) or "regional" (52 numeric features).
+# params_from copies the best hyperparameters found by an earlier tuning run.
+# Deep learning runs list only the settings that differ from dl_defaults.
+
+baselines:
+  - {name: baseline_always_rain, kind: always_rain}
+  - {name: baseline_persistence, kind: persistence}
+  - {name: baseline_climatology, kind: climatology}
+
+ml:
+  - {name: ml_01_logistic_regression, estimator: logistic_regression, feature_set: base,
+     params: {max_iter: 2000}, notes: Linear baseline}
+  - {name: ml_02_linear_svm, estimator: linear_svm, feature_set: base,
+     params: {max_iter: 5000}, notes: Maximum-margin linear model}
+  - {name: ml_03_random_forest, estimator: random_forest, feature_set: base, save_model: false,
+     params: {n_estimators: 200, min_samples_leaf: 5, n_jobs: -1, random_state: 42}, notes: Bagged trees}
+  - {name: ml_04_hist_gradient_boosting, estimator: hist_gradient_boosting, feature_set: base,
+     params: {random_state: 42}, notes: Boosted trees}
+  - name: ml_05_logreg_tuned
+    estimator: logistic_regression
+    feature_set: base
+    params: {max_iter: 2000}
+    search:
+      n_iter: 12
+      space:
+        C: {dist: loguniform, low: 0.001, high: 100}
+        class_weight: {choices: [null, balanced]}
+    notes: Tuned regularisation strength and class weights
+  - name: ml_06_random_forest_tuned
+    estimator: random_forest
+    feature_set: base
+    save_model: false
+    params: {n_estimators: 100, n_jobs: -1, random_state: 42}
+    search:
+      n_iter: 8
+      search_jobs: 1
+      space:
+        max_depth: {choices: [10, 15, 20, null]}
+        min_samples_leaf: {choices: [5, 10, 20, 50]}
+        max_features: {choices: [sqrt, 0.5]}
+    notes: Tuned depth and leaf size to reduce overfitting
+  - name: ml_07_hgb_tuned
+    estimator: hist_gradient_boosting
+    feature_set: base
+    params: {random_state: 42}
+    search:
+      n_iter: 20
+      space:
+        learning_rate: {dist: loguniform, low: 0.02, high: 0.3}
+        max_iter: {dist: randint, low: 100, high: 600}
+        max_leaf_nodes: {dist: randint, low: 15, high: 64}
+        min_samples_leaf: {dist: randint, low: 20, high: 200}
+        l2_regularization: {dist: loguniform, low: 0.001, high: 10}
+    notes: Tuned boosting complexity and regularisation
+  - {name: ml_08_logreg_regional, estimator: logistic_regression, feature_set: regional,
+     params: {max_iter: 2000}, params_from: ml_05_logreg_tuned,
+     notes: Tuned logistic regression plus rainfall at all sites and regional means}
+  - {name: ml_09_hgb_regional, estimator: hist_gradient_boosting, feature_set: regional,
+     params: {random_state: 42}, params_from: ml_07_hgb_tuned,
+     notes: Tuned boosting plus rainfall at all sites and regional means}
+
+dl_defaults:
+  feature_set: regional
+  architecture: sequential
+  units: [128, 64]
+  batch_norm: false
+  dropout: 0.0
+  l2: 0.0
+  optimizer: adam
+  learning_rate: 0.001
+  batch_size: 256
+  max_epochs: 60
+  early_stopping_patience: 6
+
+dl:
+  - {name: dl_01_mlp_baseline, notes: Sequential MLP 128-64 with Adam}
+  - {name: dl_02_batchnorm, batch_norm: true, notes: Added batch normalisation}
+  - {name: dl_03_dropout_0.3, batch_norm: true, dropout: 0.3, notes: Added dropout 0.3}
+  - {name: dl_04_l2_1e-4, batch_norm: true, dropout: 0.3, l2: 0.0001, notes: Added L2 1e-4}
+  - {name: dl_05_lr_3e-4, batch_norm: true, dropout: 0.3, l2: 0.0001, learning_rate: 0.0003,
+     notes: Lower learning rate}
+  - {name: dl_06_batch_1024, batch_norm: true, dropout: 0.3, l2: 0.0001, batch_size: 1024,
+     notes: Larger batch size}
+  - {name: dl_07_sgd_momentum, batch_norm: true, dropout: 0.3, l2: 0.0001, optimizer: sgd,
+     learning_rate: 0.01, notes: SGD with momentum 0.9}
+  - {name: dl_08_deeper_256_128_64, batch_norm: true, dropout: 0.3, l2: 0.0001,
+     units: [256, 128, 64], notes: Deeper and wider network}
+  - {name: dl_09_functional_embedding, architecture: functional, embed_dim: 4, batch_norm: true,
+     dropout: 0.3, l2: 0.0001, notes: Functional API with a learned location embedding}

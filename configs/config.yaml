@@ -1,0 +1,75 @@
+# Central configuration for the Rwanda next-day rain prediction project.
+# Every path, date, threshold, location and feature window used by src/ is read from
+# this file, so changing a value here flows through the whole pipeline without code edits.
+
+project:
+  name: rwanda-rain-prediction
+  seed: 42
+
+paths:
+  drive_project_dir: /content/drive/MyDrive/rwanda-rain-project
+  local_project_dir: ./project_data
+  raw_subdir: raw
+  combined_csv: rwanda_weather_daily.csv
+  raw_zip_name: rwanda_weather_raw
+  models_subdir: models
+  results_subdir: results
+  figures_subdir: results/figures
+
+nasa_power:
+  api_url: https://power.larc.nasa.gov/api/temporal/daily/point
+  community: AG
+  start: "19810101"
+  end: "20251231"
+  missing_value: -999
+  request_pause_seconds: 2
+  request_timeout_seconds: 120
+  max_retries: 3
+  parameters: [PRECTOTCORR, T2M, T2M_MAX, T2M_MIN, T2MDEW, RH2M, QV2M, PS,
+               WS2M, WS2M_MAX, WD2M, ALLSKY_SFC_SW_DWN, CLOUD_AMT, GWETTOP]
+  locations:
+    Kigali: [-1.95, 30.06]
+    Musanze: [-1.50, 29.63]
+    Rubavu: [-1.68, 29.26]
+    Huye: [-2.60, 29.74]
+    Rusizi: [-2.48, 28.91]
+    Nyagatare: [-1.30, 30.33]
+    Kirehe: [-2.27, 30.71]
+    Muhanga: [-2.08, 29.76]
+    Nyamagabe: [-2.48, 29.47]
+    Rwamagana: [-1.95, 30.43]
+    Karongi: [-2.06, 29.35]
+    Gicumbi: [-1.58, 30.07]
+
+cleaning:
+  analysis_start: "1984-01-01"     # solar radiation and cloud cover only exist from 1984
+
+target:
+  name: RainTomorrow
+  rain_day_mm: 1.0
+
+features:
+  rain_lags: [1, 2, 3]
+  rain_sum_windows: [3, 7, 14, 30]
+  rain_days_window: 7
+  change_columns: [PS, RH2M, QV2M, T2M, CLOUD_AMT]
+  rainy_season_months: [3, 4, 5, 9, 10, 11, 12]
+  wind_direction_column: WD2M
+  regional_mean_columns: [RH2M, QV2M, CLOUD_AMT, PS_change]
+  categorical: [location]
+
+split:
+  train_end: "2015-12-31"
+  val_end: "2020-12-31"
+
+evaluation:
+  primary_metric: macro_f1
+  threshold: 0.5
+  learning_curve_fractions: [0.05, 0.1, 0.2, 0.4, 0.7, 1.0]
+  error_bucket_edges_mm: [0.5, 1.0, 3.0, 10.0]   # tomorrow's rainfall buckets for error analysis
+  top_errors: 10
+  top_features: 15
+
+run:
+  mode: auto        # auto: reuse finished runs saved on Drive, train the rest; train: retrain everything
+  dl_verbose: 0     # Keras fit verbosity (0 silent, 2 one line per epoch)
