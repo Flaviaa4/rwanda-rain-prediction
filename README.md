@@ -76,7 +76,7 @@ rwanda-rain-project/
 
 ## How to run
 
-**Google Colab (recommended).**
+**Google Colab**
 
 1. Open `notebooks/01_download_data.ipynb` from GitHub in Colab
    (*File > Open notebook > GitHub*) and run all cells once to build the dataset on Drive.
@@ -143,12 +143,12 @@ Validation results (macro F1, ROC-AUC and the gap between training and validatio
 
 Selected models: `ml_08_logreg_regional` (traditional ML) and `dl_04_l2_1e-4` (deep learning).
 
-**Test results (2021 to 2025):** *to be added after running the final evaluation.*
+**Test results (2021 to 2025):** On the test years 2021 to 2025, logistic regression reached a macro F1 of 0.814 and the neural network 0.817, both above the persistence baseline (0.802).
 
 ## Links
 
-* **Google Drive folder (zipped raw data and saved models):** *add link here*
-* **Video presentation:** *add link here*
+* **Google Drive folder**
+* **Video presentation:**
 
 ## Limitations
 
