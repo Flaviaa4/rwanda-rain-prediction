@@ -35,24 +35,24 @@ rwanda-rain-prediction/
 ├── README.md
 ├── requirements.txt
 ├── configs/
-│   ├── config.yaml              # paths, data source, cleaning, target, features, split, run mode
-│   └── experiments.yaml         # every baseline, ML and DL run, in the order performed
+│   ├── config.yaml              
+│   └── experiments.yaml        
 ├── src/
-│   ├── config.py                # load YAML, resolve Colab vs local paths, seed helper
-│   ├── data_download.py         # NASA POWER download, duplicate grid-cell removal, raw zip
-│   ├── data_prep.py             # load, clean, validate, create the target
-│   ├── features.py              # base features, regional features, feature-set registry
-│   ├── split.py                 # chronological train / validation / test split
-│   ├── baselines.py             # always-rain, persistence, monthly climatology
-│   ├── metrics.py               # metric computation and the shared results log
-│   ├── ml.py                    # scikit-learn pipelines, experiments, time-aware tuning
-│   ├── dl.py                    # tf.data pipelines, Keras builders, DL experiments
-│   ├── runner.py                # runs experiments from YAML, skipping finished runs
-│   ├── evaluation.py            # model selection, final test evaluation, error analysis
-│   └── plots.py                 # every figure
+│   ├── config.py                
+│   ├── data_download.py         
+│   ├── data_prep.py             
+│   ├── features.py              
+│   ├── split.py                 
+│   ├── baselines.py             
+│   ├── metrics.py               
+│   ├── ml.py                     
+│   ├── dl.py                    
+│   ├── runner.py                
+│   ├── evaluation.py             
+│   └── plots.py                 
 └── notebooks/
-    ├── 01_download_data.ipynb   # builds the raw dataset from NASA POWER
-    └── 02_rain_prediction.ipynb # main deliverable
+    ├── 01_download_data.ipynb   
+    └── 02_rain_prediction.ipynb 
 ```
 
 Each stage passes one well-defined object to the next:
@@ -67,11 +67,11 @@ Data, trained models and results are written to a project folder outside Git
 
 ```
 rwanda-rain-project/
-├── raw/<Location>.csv           # one raw CSV per location
-├── rwanda_weather_raw.zip       # zipped raw data for the submission folder
-├── rwanda_weather_daily.csv     # combined, de-duplicated raw table
-├── models/                      # per-run artifacts and the two final models
-└── results/                     # experiments.csv, best_params.json, histories, figures/
+├── raw/<Location>.csv           
+├── rwanda_weather_raw.zip       
+├── rwanda_weather_daily.csv     
+├── models/                     
+└── results/                     
 ```
 
 ## How to run
